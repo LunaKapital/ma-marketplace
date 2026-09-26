@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { PROFESSIONS, TYPES, gbp, eventDate } from "@/lib/format";
-import { createListing, deleteListing, saveProfessional, deleteProfessional } from "./actions";
+import { createListing, deleteListing, saveProfessional, deleteProfessional, createPost, deletePost } from "./actions";
 
 export const metadata = { title: "Your account" };
 
@@ -11,6 +11,7 @@ export default async function Account() {
   const sql = db();
   const mine = await sql`SELECT id, type, title, price_gbp, event_date FROM listings WHERE owner_id = ${session.uid} ORDER BY created_at DESC`;
   const [pro] = await sql`SELECT * FROM professionals WHERE user_id = ${session.uid}`;
+  const myPosts = await sql`SELECT id, title FROM posts WHERE author_id = ${session.uid} ORDER BY created_at DESC`;
 
   return (
     <div className="wrap narrow2">
@@ -68,6 +69,27 @@ export default async function Account() {
           <button className="btn big">{pro ? "Save profile" : "Create profile"}</button>
         </form>
         {pro && <form action={deleteProfessional}><button className="link danger">Remove my profile</button></form>}
+      </div>
+
+      <div className="card">
+        <h3>Your blog posts</h3>
+        {myPosts.length === 0 ? <p className="muted">Nothing published yet.</p> : myPosts.map((p) => (
+          <form key={p.id} action={deletePost} className="row">
+            <input type="hidden" name="id" value={p.id} />
+            <Link href={`/blog/${p.id}`} className="a">{p.title}</Link>
+            <button className="link danger">Delete</button>
+          </form>
+        ))}
+      </div>
+
+      <div className="card">
+        <h3>Write a post</h3>
+        <form action={createPost}>
+          <label>Title</label><input name="title" required maxLength={150} />
+          <label>Short summary (optional, shown on the homepage)</label><input name="excerpt" maxLength={300} />
+          <label>Post</label><textarea name="body" required rows={8} maxLength={20000} />
+          <button className="btn big">Publish post</button>
+        </form>
       </div>
     </div>
   );

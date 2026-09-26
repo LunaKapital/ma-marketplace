@@ -4,8 +4,8 @@ import { getSession } from "@/lib/auth";
 import LogoutButton from "@/components/LogoutButton";
 
 export const metadata = {
-  title: "M&A Marketplace",
-  description: "Businesses and real estate for sale, plus M&A lawyers, accountants and appraisers.",
+  title: "Acquisition Square",
+  description: "Everything for acquisition entrepreneurs — businesses and real estate for sale, events, communities, and M&A professionals.",
 };
 
 export default async function RootLayout({ children }) {
@@ -14,13 +14,14 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body>
         <header className="nav">
-          <Link href="/" className="brand">M&amp;A Marketplace</Link>
+          <Link href="/" className="brand">Acquisition Square</Link>
           <nav>
             <Link href="/businesses">Businesses</Link>
             <Link href="/real-estate">Real estate</Link>
             <Link href="/events">Events</Link>
             <Link href="/communities">Communities</Link>
             <Link href="/professionals">Professionals</Link>
+            <Link href="/blog">Blog</Link>
             {session ? (
               <>
                 <Link href="/account">Account</Link>
@@ -32,7 +33,7 @@ export default async function RootLayout({ children }) {
           </nav>
         </header>
         <main>{children}</main>
-        <footer className="foot">© {new Date().getFullYear()} M&amp;A Marketplace</footer>
+        <footer className="foot">© {new Date().getFullYear()} Acquisition Square</footer>
       </body>
     </html>
   );

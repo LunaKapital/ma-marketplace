@@ -57,3 +57,24 @@ export async function deleteProfessional() {
   await db()`DELETE FROM professionals WHERE user_id = ${s.uid}`;
   revalidatePath("/account"); revalidatePath("/professionals");
 }
+
+export async function createPost(fd) {
+  const s = await requireUser();
+  const title = str(fd, "title", 150);
+  const excerpt = str(fd, "excerpt", 300) || null;
+  const body = str(fd, "body", 20000);
+  if (!title || !body) return;
+  const sql = db();
+  const [{ n }] = await sql`SELECT count(*)::int AS n FROM posts WHERE author_id = ${s.uid}`;
+  if (n >= 100) return;
+  await sql`INSERT INTO posts (author_id, title, excerpt, body) VALUES (${s.uid}, ${title}, ${excerpt}, ${body})`;
+  revalidatePath("/account"); revalidatePath("/"); revalidatePath("/blog");
+}
+
+export async function deletePost(fd) {
+  const s = await requireUser();
+  const id = Number(fd.get("id"));
+  if (!Number.isInteger(id)) return;
+  await db()`DELETE FROM posts WHERE id = ${id} AND author_id = ${s.uid}`;
+  revalidatePath("/account"); revalidatePath("/"); revalidatePath("/blog");
+}
